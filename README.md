@@ -24,7 +24,9 @@ uv sync
 
 ## Usage
 The expert trajectories used during the experiments can be found here:
-https://drive.google.com/drive/folders/1GiwgfrnFAjZ1JGaw3T-KeViGdOFbkRqr?usp=drive_link
+https://drive.google.com/file/d/1ZBZPjQITGLkiKusdGAwObLdomTTU3bqs/view?usp=drive_link
+
+Set `buffer_folder` and `model_folder` in `conf/config.yaml` using absolute path.
 
 Then, just run the scripts in the `scripts` dir. You can try as follows:
 
