@@ -52,8 +52,8 @@ eval_only: False
 # Replay buffer save/load
 save_replay_buffer: False  # Whether to save replay buffer when saving models
 load_replay_buffer: False  # Whether to load saved replay buffer at start
-buffer_folder: /home/ubuntu/xutian/mb_ail/buffers/  # Folder to save/load replay buffers
-model_folder: /home/ubuntu/xutian/mb_ail/saved_model_hyper/
+buffer_folder: ???
+model_folder: ???
 
 # Do offline learning
 offline: False

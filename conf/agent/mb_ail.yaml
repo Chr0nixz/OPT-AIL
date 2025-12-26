@@ -55,7 +55,7 @@ agent:
 
   include_ent_in_adv: false
   adv_weight: 3e-4
-  opt: false
+  opt: true
   fixed_std: 0.1
 
 dynamics:
