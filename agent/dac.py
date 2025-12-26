@@ -5,12 +5,14 @@ import torch.nn.functional as F
 from torch.optim import Adam
 import hydra
 
-from utils.utils import soft_update, hard_update, get_concat_samples
-from agent.sac_models import DoubleQCritic
+from module.net import soft_update, hard_update
+from module.critic import DoubleQCritic
+from utils.utils import get_concat_samples
 
 
 class DAC(object):
     def __init__(self, obs_dim, action_dim, action_range, batch_size, args):
+        self.name = "dac"
         self.gamma = args.gamma
         self.batch_size = batch_size
         self.action_range = action_range
@@ -33,7 +35,6 @@ class DAC(object):
 
         self.log_alpha = torch.tensor(np.log(agent_cfg.init_temp)).to(self.device)
         self.log_alpha.requires_grad = True
-        # Target Entropy = −dim(A) (e.g. , -6 for HalfCheetah-v2) as given in the paper
         self.target_entropy = -action_dim
 
         # optimizers
@@ -145,7 +146,7 @@ class DAC(object):
         return loss_dict
 
     def update_critic(self, policy_batch, expert_batch):
-        batch = get_concat_samples(policy_batch, expert_batch, self.args)
+        batch = get_concat_samples(policy_batch, expert_batch)
         obs, next_obs, action, reward, done = batch[:5]
         reward = self.infer_r(obs, action)
 

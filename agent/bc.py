@@ -5,12 +5,12 @@ import torch.nn.functional as F
 from torch.optim import Adam
 import hydra
 
-from utils.utils import soft_update, hard_update, get_concat_samples
-from agent.sac_models import DoubleQCritic
+from module.critic import DoubleQCritic
 
 
 class BC(object):
     def __init__(self, obs_dim, action_dim, action_range, batch_size, args):
+        self.name = "bc"
         self.gamma = args.gamma
         self.batch_size = batch_size
         self.action_range = action_range
@@ -40,6 +40,8 @@ class BC(object):
     def update(self, policy_buffer, expert_buffer, logger, step):
         expert_batch = expert_buffer.get_samples(self.batch_size, self.device)
         expert_obs, _, expert_action, _, _ = expert_batch[:5]
+        EPS = 1e-5
+        expert_action = expert_action.clamp(-1 + EPS, 1 - EPS)
         
         losses = dict()
         loss = -self.actor.log_prob(expert_obs, expert_action).mean()
@@ -47,6 +49,7 @@ class BC(object):
 
         self.actor_optimizer.zero_grad(set_to_none=True)
         loss.backward()
+
         self.actor_optimizer.step()
         
         if step % 100 == 0:
@@ -59,6 +62,7 @@ class BC(object):
     def save(self, path, suffix=""):
         actor_path = f"{path}{suffix}_actor"
         torch.save(self.actor.state_dict(), actor_path)
+        print("Saved actor model to {}".format(actor_path))
 
     # Load model parameters
     def load(self, path, suffix=""):

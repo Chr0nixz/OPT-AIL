@@ -1,15 +1,34 @@
 # @package _global_
 
 agent:
-  name: dac
-  _target_: agent.dac.DAC
+  name: cmil
+  _target_: agent.mb_ail.CMIL
   obs_dim: ??? # to be specified later
   action_dim: ??? # to be specified later
 
+  dynamics_cfg: ${dynamics}
   critic_cfg: ${q_net}
   actor_cfg: ${diag_gaussian_actor}
   disc_cfg: ${disc_net}
   init_temp: 1e-2 # use a low temp for IL
+
+  # Rollout parameters
+  rollout_min_length: 1
+  rollout_max_length: 1
+  rollout_min_epoch: 20
+  rollout_max_epoch: 150
+
+  # Generate buffer parameters
+  generate_batch_size: 10000     # Batc
+  model_retain_epochs: 1
+  real_ratio: 0.8
+  dynamics_update_freq: 250
+  holdout_ratio: 0.2
+  max_epochs_since_update: 5
+  logvar_loss_coef: 1e-2
+
+  dynamics_lr: 3e-4
+  dynamics_betas: [0.9, 0.999]
 
   alpha_lr: 3e-4
   alpha_betas: [0.9, 0.999]
@@ -29,10 +48,27 @@ agent:
 
   # learn temperature coefficient (disabled by default)
   learn_temp: false
-  update_per_step: 10
+  update_per_step: 1
 
   # Use either value_dice actor or normal SAC actor loss
   vdice_actor: false
+
+  include_ent_in_adv: false
+  adv_weight: 3e-4
+
+  unc_penalty: 1
+
+dynamics:
+  _target_: module.dynamics.EnsembleDynamics
+  obs_dim: ${agent.obs_dim}
+  action_dim: ${agent.action_dim}
+  hidden_dims: [256, 256, 256, 256, 256, 256]
+  weight_decays: [2.5e-5, 2.5e-5, 5e-5, 7.5e-5, 7.5e-5, 1e-4, 1e-4]
+  num_ensemble: 7
+  num_elites: 5
+  dropout: 0
+  deterministic: true
+#  fixed_std: 0.1
 
 q_net:
   _target_: module.critic.SingleQCritic

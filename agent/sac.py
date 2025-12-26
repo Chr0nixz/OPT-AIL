@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch.optim import Adam
 import hydra
 
-from utils.utils import soft_update
+from module.net import soft_update
 
 
 class SAC(object):
